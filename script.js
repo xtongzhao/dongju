@@ -40,7 +40,8 @@
       t.classList.toggle('active', parseInt(t.dataset.ep) === ep);
     });
     // 2. 刷新所有手机中的 AI 面板
-    const epObj = WORLD_EPISODES[_worldEp - 1] || WORLD_EPISODES[WORLD_EPISODES.length - 1];
+    //   单页长滚模式下 AI 面板是 5 板块并列，切集数需要整体重渲
+    //   为了不打断用户视觉（不跳回顶部/前情回顾），记录当前 scrollTop 后重渲再滚回
     document.querySelectorAll('.phone-mount').forEach(mount => {
       const phone = mount.querySelector('.phone-wrap');
       if (!phone || !phone._tpState) return;
@@ -48,20 +49,13 @@
       if (st.tab !== 'ai') return;
       const panelEl = phone.querySelector('[data-panel]');
       if (!panelEl) return;
-      if (st.sub === 'world') {
-        // 世界线：整图重渲
-        panelEl.innerHTML = renderWorldPanel(_worldEp - 1);
-        bindWorldZoom(panelEl);
-      } else if (st.sub === 'rel') {
-        // 人物关系：按集数重渲不同图谱
-        panelEl.innerHTML = renderRelPanel(_worldEp);
-        bindWorldZoom(panelEl); // 关系图也有缩放控件
-      } else {
-        // 其余场景：仅更新集数徽标
-        const ctx = panelEl.querySelector('.ai-ep-context');
-        if (ctx) ctx.textContent = '📺 当前：' + epObj.label;
-      }
-      panelEl.scrollTop = 0;
+      const prevScroll = panelEl.scrollTop;
+      // 整体重渲 AI 面板（5 板块内容随集数刷新）
+      panelEl.innerHTML = panelByKey('ai', st.range);
+      // 重绑事件（关系图头像点击、世界线缩放、集数 chip等）
+      if (typeof phone._rebindAI === 'function') phone._rebindAI();
+      // 视觉保持：滚回原位置，让用户仍停留在当前板块（而非跳到顶部/前情回顾）
+      panelEl.scrollTop = prevScroll;
     });
   }
 
@@ -1066,6 +1060,14 @@ const hidden = isAll ? {
     bindWorldZoom(panelEl);
     // 初始若已在 AI tab，立即启用滚动联动
     if (state.tab === 'ai') setupAiScrollSpy();
+
+    // 集数切换等外部刷新 AI 面板后需要重绑：range chip / 头像点击 / 世界线缩放 / 滚动联动
+    wrap._rebindAI = function () {
+      bindRangeChips();
+      bindRelCards();
+      bindWorldZoom(panelEl);
+      if (state.tab === 'ai') setupAiScrollSpy();
+    };
 
     // 提供外部方法：滚动到指定子板块（每个大页面初始定位/ 大页面切换时联动）
     wrap._scrollToSub = function (subKey) {
