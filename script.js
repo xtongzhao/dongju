@@ -896,6 +896,44 @@ const hidden = isAll ? {
       bindRelCards();
       bindWorldZoom(panelEl);
       panelEl.scrollTop = 0;
+      // AI 懂剧：绑定滚动联动，滚到哪个板块子tab 就高亮哪个
+      if (state.tab === 'ai') setupAiScrollSpy();
+    }
+
+    // 滚动监听：找出当前视口内"最靠上"的 .ai-section，把对应子 tab 高亮
+    // 只在 AI 面板生效，一次绑定后即使 rebuildPanel 也复用
+    let _scrollSpyBound = false;
+    let _scrollSpyRaf = 0;
+    function setupAiScrollSpy() {
+      const updateActive = () => {
+        _scrollSpyRaf = 0;
+        const subs = panelEl.querySelectorAll('.ai-sub');
+        const sections = panelEl.querySelectorAll('.ai-section');
+        if (!subs.length || !sections.length) return;
+        // 计算 sticky 子 tab 行占据的高度，判定"靠上"时要往下偏移这一段
+        const stickyH = (panelEl.querySelector('.tp-ai-subtabs')?.offsetHeight || 0);
+        const panelTop = panelEl.getBoundingClientRect().top + stickyH;
+        let bestId = sections[0].id;
+        let bestDist = Infinity;
+        sections.forEach(sec => {
+          const top = sec.getBoundingClientRect().top;
+          // 已经越过 sticky 行下沿的（top <= panelTop）里，取距离 panelTop 最近的
+          if (top - panelTop <= 4) {
+            const d = panelTop - top;
+            if (d < bestDist) { bestDist = d; bestId = sec.id; }
+          }
+        });
+        subs.forEach(s => s.classList.toggle('on', s.getAttribute('href') === '#' + bestId));
+      };
+      if (!_scrollSpyBound) {
+        _scrollSpyBound = true;
+        panelEl.addEventListener('scroll', () => {
+          if (_scrollSpyRaf) return;
+          _scrollSpyRaf = requestAnimationFrame(updateActive);
+        }, { passive: true });
+      }
+      // 首次渲染立即刷新一次
+      updateActive();
     }
 
     wrap.querySelectorAll('.tp-tab').forEach(t => {
@@ -1026,6 +1064,8 @@ const hidden = isAll ? {
     bindRangeChips();
     bindRelCards();
     bindWorldZoom(panelEl);
+    // 初始若已在 AI tab，立即启用滚动联动
+    if (state.tab === 'ai') setupAiScrollSpy();
 
     // FAQ 展开答案 / 时间线卡片展开收起 —— 无条件绑定一次（不依赖关系图数据是否加载）
     if (!panelEl._genDelegated) {
