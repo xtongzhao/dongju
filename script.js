@@ -817,7 +817,7 @@ const hidden = isAll ? {
   }
 
   // 生成一台完整播放器
-  function buildPhone(defaultTab) {
+  function buildPhone(defaultTab, defaultSub) {
     const wrap = document.createElement('div');
     wrap.className = 'phone-wrap';
     wrap.innerHTML = `
@@ -1067,6 +1067,27 @@ const hidden = isAll ? {
     // 初始若已在 AI tab，立即启用滚动联动
     if (state.tab === 'ai') setupAiScrollSpy();
 
+    // 提供外部方法：滚动到指定子板块（每个大页面初始定位/ 大页面切换时联动）
+    wrap._scrollToSub = function (subKey) {
+      if (state.tab !== 'ai' || !subKey) return;
+      const target = panelEl.querySelector('#ai-sec-' + subKey);
+      if (!target) return;
+      const stickyH = panelEl.querySelector('.tp-ai-subtabs')?.offsetHeight || 0;
+      const top = target.getBoundingClientRect().top
+        - panelEl.getBoundingClientRect().top
+        + panelEl.scrollTop - stickyH - 2;
+      panelEl.scrollTo({ top: Math.max(0, top), behavior: 'auto' });
+      // 同步高亮
+      panelEl.querySelectorAll('.ai-sub').forEach(s =>
+        s.classList.toggle('on', s.getAttribute('href') === '#ai-sec-' + subKey));
+    };
+
+    // 若配置了 defaultSub，初始渲染完成后直接滚到对应板块（这样每个大页面手机进入就展示对应内容）
+    if (defaultTab === 'ai' && defaultSub) {
+      // 图片/svg 加载可能改变布局高度，等下一帧再算
+      requestAnimationFrame(() => wrap._scrollToSub(defaultSub));
+    }
+
     // FAQ 展开答案 / 时间线卡片展开收起 —— 无条件绑定一次（不依赖关系图数据是否加载）
     if (!panelEl._genDelegated) {
       panelEl._genDelegated = true;
@@ -1180,7 +1201,8 @@ const hidden = isAll ? {
     const mount = sec.querySelector('.phone-mount');
     if (!mount) return;
     const defaultTab = sec.dataset.defaultTab || 'detail';
-    mount.appendChild(buildPhone(defaultTab));
+    const defaultSub = sec.dataset.defaultSub || '';
+    mount.appendChild(buildPhone(defaultTab, defaultSub));
   });
 
   // 2. 生成左侧导航
@@ -1195,7 +1217,7 @@ const hidden = isAll ? {
   });
   const navItems = Array.from(navListEl.querySelectorAll('li'));
 
-  // 3. 页面高亮 + 入场动画
+  // 3. 页面高亮 + 入场动画 + 手机内 AI懂剧联动滚到对应板块
   const io = new IntersectionObserver(
     (entries) => {
     entries.forEach((entry) => {
@@ -1205,6 +1227,12 @@ const idx = Number(entry.target.dataset.index);
  navItems.forEach((n) => n.classList.remove('active'));
     const cur = navItems[idx];
   if (cur) cur.classList.add('active');
+   // 联动：如果这一页手机是 AI tab 且指定了 sub，则滚动到对应板块
+   const sub = entry.target.dataset.defaultSub;
+   if (sub) {
+     const wrap = entry.target.querySelector('.phone-wrap');
+     if (wrap && wrap._scrollToSub) wrap._scrollToSub(sub);
+   }
         }
    });
  },
