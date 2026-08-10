@@ -13,12 +13,20 @@
     { key: 'ai', label: 'AI懂剧' }
   ];
   // AI 懂剧内的 5 个二级 Tab
+  // 子tab 使用线性 SVG 图标（对齐参考图样式）
+  const ICO = {
+    recap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H12v15H5.5A1.5 1.5 0 0 1 4 17.5v-12Z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H12v15h6.5A1.5 1.5 0 0 0 20 17.5v-12Z"/></svg>',
+    rel:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>',
+    time:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3h11M6.5 21h11"/><path d="M7 3.5v2.7c0 3 5 3 5 5.8s-5 2.8-5 5.8v2.7"/><path d="M17 3.5v2.7c0 3-5 3-5 5.8s5 2.8 5 5.8v2.7"/></svg>',
+    world: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.5 2.6 3.8 5.5 3.8 8.5s-1.3 5.9-3.8 8.5c-2.5-2.6-3.8-5.5-3.8-8.5S9.5 6.1 12 3.5Z"/></svg>',
+    faq:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 17h-7l-4 3v-3H5a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 5 5Z"/></svg>'
+  };
   const AI_SUBTABS = [
-    { key: 'recap', label: '前情回顾', icon: '📖' },
-    { key: 'rel', label: '人物关系', icon: '👥' },
-    { key: 'time', label: '时间线', icon: '🕒' },
-    { key: 'world', label: '世界线', icon: '🌐' },
-    { key: 'faq', label: '常问问题', icon: '💬' }
+    { key: 'recap', label: '前情回顾', icon: ICO.recap },
+    { key: 'rel', label: '人物关系', icon: ICO.rel },
+    { key: 'time', label: '时间线', icon: ICO.time },
+    { key: 'world', label: '世界线', icon: ICO.world },
+    { key: 'faq', label: '常问问题', icon: ICO.faq }
   ];
 
   /* ================= 世界线分集数据 ================= */
