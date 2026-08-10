@@ -399,7 +399,6 @@
         </div>
         <div class="rel-legend"><b>图例:</b>${LEGEND.map(l => `<span><i class="ln ${l.d}" style="background:${l.d==='solid'?l.c:''};background-image:${l.d==='dashed'?`repeating-linear-gradient(to right,${l.c} 0 4px,transparent 4px 7px)`:'none'}"></i>${l.t}</span>`).join('')}</div>
         <div class="rel-strip">${stripHtml}</div>
-        <div class="rel-sheet" data-sheet hidden><div class="rel-sheet-inner" data-sheet-inner></div></div>
         <script type="application/json" data-chars>${JSON.stringify(CHARS)}</script>
       </div>
     `;
@@ -832,6 +831,7 @@ const hidden = isAll ? {
     </div>
      <div class="tp-panel" data-panel>${panelByKey(defaultTab, 'only')}</div>
        </div>
+     <div class="rel-sheet" data-sheet hidden><div class="rel-sheet-inner" data-sheet-inner></div></div>
      <div class="tp-fab" data-fab style="display:${defaultTab === 'ai' ? 'flex' : 'none'}"><img src="./assets/penguin-fab.png" alt="懂剧助手" /></div>
      <div class="tp-chat" data-chat>
        <div class="ai-assist-card">
@@ -926,8 +926,8 @@ const hidden = isAll ? {
       const charsScript = panelEl.querySelector('[data-chars]');
     if (!charsScript) return;
    const CHARS = JSON.parse(charsScript.textContent);
-   const sheet = panelEl.querySelector('[data-sheet]');
-      const inner = panelEl.querySelector('[data-sheet-inner]');
+   const sheet = wrap.querySelector('[data-sheet]');
+      const inner = wrap.querySelector('[data-sheet-inner]');
       const factionCls = { '正派': 'fac-good', '反派': 'fac-bad', '中立': 'fac-mid' };
      const imgTag = (id, cls) => { const s = (CHARS[id]||{}).img; return s ? `<img src="${s}" class="rel-avatar ${cls}" alt="${CHARS[id]?.name||id}"/>` : `<div class="rel-avatar ${cls}"></div>`; };
 
