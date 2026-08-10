@@ -601,7 +601,7 @@ font-size: 9px;
   color: #9098aa;
 }
 
-/* ========== AI 懂剧 ========== */
+/* ========== AI 懂剧（单页长滚模式） ========== */
 .tp-ai-subtabs {
   display: flex;
   gap: 6px;
@@ -609,6 +609,11 @@ font-size: 9px;
   padding-bottom: 8px;
   margin-bottom: 8px;
   scrollbar-width: none;
+  position: sticky;
+  top: 0;
+  background: #f7f8fa;
+  z-index: 2;
+  padding-top: 4px;
 }
 .tp-ai-subtabs::-webkit-scrollbar { display: none; }
 .tp-ai-subtabs .ai-sub {
@@ -622,6 +627,7 @@ font-size: 9px;
   color: #6b7085;
   cursor: pointer;
   white-space: nowrap;
+  text-decoration: none;
 }
 .tp-ai-subtabs .ai-sub i { font-style: normal; }
 .tp-ai-subtabs .ai-sub.on {
@@ -645,15 +651,10 @@ font-size: 9px;
   object-fit: cover;
 }
 
+/* 单页长滚：5 个板块依次排开，每个板块有独立间距 */
 .tp-ai-content { position: relative; }
-
-/* AI 子部分切换过渡：避免硬切跳变，跟随滑动方向淡入位移 */
-.tp-ai-content.ai-enter { animation: aiFade .26s cubic-bezier(.22,.61,.36,1) both; }
-.tp-ai-content.ai-enter.ai-enter-up { animation-name: aiEnterUp; }
-.tp-ai-content.ai-enter.ai-enter-down { animation-name: aiEnterDown; }
-@keyframes aiFade { from { opacity: 0; } to { opacity: 1; } }
-@keyframes aiEnterUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-@keyframes aiEnterDown { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }
+.ai-section { margin-bottom: 20px; }
+.ai-section:last-child { margin-bottom: 0; }
 
 .ai-card {
   border: 1px solid #ecf1ef;
