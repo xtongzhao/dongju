@@ -329,6 +329,21 @@
     const CHARS = CHARS_ALL;
     const POS = POS_ALL;
 
+    // 从当前集数的关系边派生每个人物的 rels 数组，供弹层"🔗 人物关系"展示相关人物
+    // 颜色 → 关系类型（对应 CSS .t-love/.t-blood/.t-ally/.t-foe/.t-past）
+    const COLOR_TYPE = { '#e11d48': 'love', '#f97316': 'blood', '#2563eb': 'ally', '#dc2626': 'foe', '#6b7280': 'past', '#7c3aed': 'past' };
+    const CHARS_WITH_RELS = {};
+    Object.keys(CHARS).forEach(id => {
+      const rels = [];
+      ep.lines.forEach(l => {
+        if (!visSet.has(l.a) || !visSet.has(l.b)) return;
+        const type = COLOR_TYPE[l.c] || 'past';
+        if (l.a === id) rels.push({ id: l.b, label: l.lb || '关联', type });
+        else if (l.b === id) rels.push({ id: l.a, label: l.lb || '关联', type });
+      });
+      CHARS_WITH_RELS[id] = Object.assign({}, CHARS[id], { rels });
+    });
+
     const avatarImg = (id, cls = '') => {
       const src = (CHARS[id] || {}).img || '';
       return src ? `<img src="${src}" class="rel-avatar ${cls}" alt="${CHARS[id]?.name || id}" />` : `<div class="rel-avatar ${cls} ${CHARS[id]?.color || ''}"></div>`;
@@ -399,7 +414,7 @@
         </div>
         <div class="rel-legend"><b>图例:</b>${LEGEND.map(l => `<span><i class="ln ${l.d}" style="background:${l.d==='solid'?l.c:''};background-image:${l.d==='dashed'?`repeating-linear-gradient(to right,${l.c} 0 4px,transparent 4px 7px)`:'none'}"></i>${l.t}</span>`).join('')}</div>
         <div class="rel-strip">${stripHtml}</div>
-        <script type="application/json" data-chars>${JSON.stringify(CHARS)}</script>
+        <script type="application/json" data-chars>${JSON.stringify(CHARS_WITH_RELS)}</script>
       </div>
     `;
   }
