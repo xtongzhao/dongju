@@ -1694,7 +1694,7 @@ display: flex;
 /* 聊天卡片（自底部滑入的半层） */
 .ai-assist-card {
   width: 100%;
-  height: 84%;
+  height: 34%;
   background: #fff;
   border-radius: 20px 20px 0 0;
   box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.18);
@@ -1917,7 +1917,7 @@ display: flex;
 
 /* 响应式：手机内半层聊天窗 */
 @media (max-width: 480px) {
-  .ai-assist-card { height: 88%; }
+  .ai-assist-card { height: 36%; }
   .tp-fab { right: 14px; bottom: 20px; width: 46px; height: 46px; }
 }
 @media (max-width: 1024px) {
