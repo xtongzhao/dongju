@@ -607,14 +607,16 @@ font-size: 9px;
   display: flex;
   gap: 6px;
   overflow-x: auto;
-  padding-bottom: 8px;
-  margin-bottom: 8px;
   scrollbar-width: none;
   position: sticky;
   top: 0;
-  background: #f7f8fa;
-  z-index: 2;
-  padding-top: 4px;
+  z-index: 3;
+  /* 全幅出血，抵消 .tp-panel 的 12px/14px 内边距，使其直接顶到主 tab 栏下方、无间隙 */
+  margin: -12px -14px 0;
+  padding: 9px 14px;
+  /* 与主 tab 栏同色、加同款下边框，看起来是一体的第二行而非悬浮层 */
+  background: #fff;
+  border-bottom: 1px solid #eef0f4;
 }
 .tp-ai-subtabs::-webkit-scrollbar { display: none; }
 .tp-ai-subtabs .ai-sub {
@@ -640,6 +642,7 @@ font-size: 9px;
 .tp-ai-banner {
   position: relative;
   border-radius: 12px;
+  margin-top: 12px;
   margin-bottom: 12px;
   overflow: hidden;
   background: #eef4f7;
