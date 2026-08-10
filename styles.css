@@ -837,15 +837,31 @@ background: #3b82f6;
   position: absolute;
   right: 12px;
   bottom: 24px;
-  width: 36px; height: 36px;
+  width: 42px; height: 42px;
   border-radius: 50%;
-  background: var(--brand);
-  color: #fff;
-  font-size: 18px;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 8px 18px rgba(20, 184, 166, 0.45);
-  z-index: 5;
-  pointer-events: none;
+  overflow: hidden;
+  cursor: pointer;
+  z-index: 6;
+  background: #fff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  pointer-events: auto;
+  animation: tpFabPulse 2.5s ease-in-out infinite;
+}
+.tp-fab img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.tp-fab:hover {
+  transform: scale(1.08);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+.tp-fab:active { transform: scale(0.92); }
+@keyframes tpFabPulse {
+  0%, 100% { box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18); }
+  50% { box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28); }
 }
 
 /* ========== 人物关系图（新版）========== */
@@ -1656,82 +1672,40 @@ display: flex;
   font-size: 12px;
 }
 
-/* ========== AI 懂剧助手 悬浮窗 ========== */
-.ai-assist-fab {
-  position: fixed;
-  right: 28px;
-  bottom: 36px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  overflow: hidden;
-  cursor: pointer;
-  z-index: 100;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-  user-select: none;
-  animation: aiFabPulse 2.5s ease-in-out infinite;
-  box-shadow:
-    0 6px 20px rgba(0, 0, 0, 0.15),
-    0 2px 6px rgba(0, 0, 0, 0.08);
-}
-.ai-assist-fab img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.ai-assist-fab:hover {
-  transform: scale(1.1);
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.2),
-    0 3px 10px rgba(0, 0, 0, 0.1);
-}
-.ai-assist-fab:active { transform: scale(0.94); }
-@keyframes aiFabPulse {
-  0%, 100% { box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0,0,0,0.08); }
-  50% { box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22), 0 2px 10px rgba(0,0,0,0.12); }
-}
+/* ========== AI 懂剧助手（手机内半层） ========== */
 
-/* 遮罩层 */
-.ai-assist-overlay {
-  position: fixed;
+/* 手机内 半层聊天窗（覆盖手机屏幕下半部分） */
+.tp-chat {
+  position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.25);
-  z-index: 199;
+  z-index: 20;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(0, 0, 0, 0.28);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.28s ease;
 }
-.ai-assist-overlay.show {
+.tp-chat.open {
   opacity: 1;
   pointer-events: auto;
 }
 
-/* 弹窗主体 */
-.ai-assist-modal {
-  position: fixed;
-  right: 20px;
-  bottom: 100px;
-  width: 380px;
-  max-height: 560px;
+/* 聊天卡片（自底部滑入的半层） */
+.ai-assist-card {
+  width: 100%;
+  height: 84%;
   background: #fff;
-  border-radius: 20px;
-  box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.18),
-    0 4px 12px rgba(0, 0, 0, 0.08);
-  z-index: 200;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.18);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  opacity: 0;
-  transform: translateY(16px) scale(0.96);
-  pointer-events: none;
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(100%);
+  transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.ai-assist-modal.show {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-  pointer-events: auto;
+.tp-chat.open .ai-assist-card {
+  transform: translateY(0);
 }
 
 /* 头部 */
@@ -1941,16 +1915,10 @@ display: flex;
 .ai-assist-send:hover { background: #14b8a6; color: #fff; }
 .ai-assist-send:active { transform: scale(0.92); }
 
-/* 响应式：悬浮窗 */
+/* 响应式：手机内半层聊天窗 */
 @media (max-width: 480px) {
-  .ai-assist-modal {
-    right: 10px;
-    left: 10px;
-    width: auto;
-    bottom: 80px;
-    max-height: 65vh;
-  }
-  .ai-assist-fab { right: 16px; bottom: 24px; width: 50px; height: 50px; font-size: 23px; }
+  .ai-assist-card { height: 88%; }
+  .tp-fab { right: 14px; bottom: 20px; width: 46px; height: 46px; }
 }
 @media (max-width: 1024px) {
   .page-inner { flex-direction: column; gap: 32px; padding: 40px 32px; }

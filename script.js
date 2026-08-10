@@ -817,9 +817,36 @@ const hidden = isAll ? {
        </span>
    `).join('')}
     </div>
-   <div class="tp-panel" data-panel>${panelByKey(defaultTab, defaultSub, 'only')}</div>
+     <div class="tp-panel" data-panel>${panelByKey(defaultTab, defaultSub, 'only')}</div>
        </div>
-     <div class="tp-fab" data-fab style="display:${defaultTab === 'ai' ? 'flex' : 'none'}">🐧</div>
+     <div class="tp-fab" data-fab style="display:${defaultTab === 'ai' ? 'flex' : 'none'}"><img src="./assets/penguin-fab.png" alt="懂剧助手" /></div>
+     <div class="tp-chat" data-chat>
+       <div class="ai-assist-card">
+         <div class="ai-assist-head">
+           <span class="ai-assist-title">AI 懂剧助手</span>
+           <span class="ai-assist-badge">BETA</span>
+           <button class="ai-assist-close" data-chat-close>×</button>
+         </div>
+         <div class="ai-assist-body" data-chat-body>
+           <div class="ai-assist-welcome">
+             <div class="ai-assist-avatar"><img src="./assets/penguin-fab.png" alt="" /></div>
+             <div class="ai-assist-msg">
+               你好呀！我是 AI 懂剧助手 🎬<br>有什么关于剧情的问题都可以问我哦。
+               <div class="ai-assist-note">📌 仅根据你看过的剧集作答</div>
+             </div>
+           </div>
+           <div class="ai-assist-suggests">
+             <button class="ai-assist-sug" data-q="谢征为什么愿意入赘？">谢征为什么愿意入赘？</button>
+             <button class="ai-assist-sug" data-q="新婚夜泼水那段是怎么回事？">新婚夜泼水那段是怎么回事？</button>
+             <button class="ai-assist-sug" data-q="谢征的银簪子是怎么赎回来的？">谢征的银簪子是怎么赎回来的？</button>
+           </div>
+         </div>
+         <div class="ai-assist-foot">
+           <input class="ai-assist-input" data-chat-input placeholder="想问什么剧情？" />
+           <button class="ai-assist-send" data-chat-send>↑</button>
+         </div>
+       </div>
+     </div>
  </div>
      <div class="phone-home"></div>
 </div>
@@ -828,6 +855,7 @@ const hidden = isAll ? {
     // 一级 Tab 切换
     const panelEl = wrap.querySelector('[data-panel]');
     const fabEl = wrap.querySelector('[data-fab]');
+    const chatEl = wrap.querySelector('[data-chat]');
     const state = { tab: defaultTab, sub: defaultSub || 'recap', range: 'only' };
     wrap.querySelectorAll('.tp-tab').forEach(t => {
     t.addEventListener('click', () => {
@@ -836,6 +864,7 @@ const hidden = isAll ? {
    state.tab = t.dataset.tab;
    panelEl.innerHTML = panelByKey(state.tab, state.sub, state.range);
     fabEl.style.display = state.tab === 'ai' ? 'flex' : 'none';
+    if (chatEl) chatEl.classList.remove('open');
     bindSubTabs();
      bindRangeChips();
    bindRelCards();
@@ -981,6 +1010,78 @@ sheet.addEventListener('click', (e) => {
       });
     }
 
+    // 8. 手机内 AI 懂剧助手：企鹅入口 → 弹半层聊天窗
+    (function initPhoneAssist() {
+      const fab = wrap.querySelector('[data-fab]');
+      const chat = wrap.querySelector('[data-chat]');
+      const body = wrap.querySelector('[data-chat-body]');
+      const input = wrap.querySelector('[data-chat-input]');
+      const sendBtn = wrap.querySelector('[data-chat-send]');
+      const closeBtn = wrap.querySelector('[data-chat-close]');
+      if (!fab || !chat) return;
+
+      function openChat() { chat.classList.add('open'); setTimeout(() => input.focus(), 300); }
+      function closeChat() { chat.classList.remove('open'); }
+
+      fab.addEventListener('click', openChat);
+      closeBtn.addEventListener('click', closeChat);
+      chat.addEventListener('click', (e) => { if (e.target === chat) closeChat(); });
+
+      // 快捷问题 → 用户气泡 + AI 回复
+      body.addEventListener('click', (e) => {
+        const sug = e.target.closest('.ai-assist-sug');
+        if (!sug) return;
+        const q = sug.dataset.q || sug.textContent.trim();
+        appendUserQ(q);
+        simulateReply(q);
+      });
+
+      function doSend() {
+        const q = input.value.trim();
+        if (!q) return;
+        input.value = '';
+        appendUserQ(q);
+        simulateReply(q);
+      }
+      sendBtn.addEventListener('click', doSend);
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSend(); });
+
+      function appendUserQ(text) {
+        const div = document.createElement('div');
+        div.className = 'ai-assist-user-q';
+        div.innerHTML = `<div class="ai-assist-user-bubble">${text}</div>`;
+        body.appendChild(div);
+        body.scrollTop = body.scrollHeight;
+      }
+
+      const FAQ_MAP = {
+        '谢征为什么愿意入赘？': '主要有两个原因：一是报恩，长玉在雪地里救了他一命，还当掉母亲的银簪子为他治伤；二是对长玉动心了。第2集中长玉想提入赘的事却不好意思开口，谢征听到她跟猪"诉苦"才知道这件事，于是主动答应入赘，帮她保住宅子不被大伯夺走。',
+        '新婚夜泼水那段是怎么回事？': '第5集中，长玉不小心把赵大娘送的"画本"丢出窗外，砸中了偷听的大伯和大伯母。为了不让他们发现是假成婚，谢征让长玉把蜡烛放侧边，把两人的影子映在窗户上——演了一出"假圆房"的戏。大伯娘还想翻墙来看，长玉出来故意往他们那边泼水，大伯娘尝了味道后信以为真！',
+        '谢征的银簪子是怎么赎回来的？': '长玉为了救谢征，把母亲的银簪子当掉换了二两银子。第4集中，谢征通过传讯鸟联络亲信五七，特意写了一篇时文让赵大叔拿去四季书肆，换得二十两银子，偷偷把银簪子赎了回来。第5集他半真半假地跟长玉说是书肆老板赏识他的时文，送了簪子和二十两给他，长玉信以为真～',
+        '樊长玉的武功是跟谁学的？': '樊长玉的武功是跟父亲樊二牛学的。她父亲教她"长柄刀法"，嘱咐她不能轻易示人。第2集中长玉仅靠一根棍子就把金爷的手下打得屁滚尿流！不过她父亲为什么一个杀猪屠户会这套精妙刀法，这里面藏着很大的秘密哦。',
+        '两把一模一样的玉簪子有什么含义？': '第1集中，长玉在雪地救下谢征时，发现他手中有一把玉簪子，跟她母亲的玉簪子一模一样。长玉觉得这是母亲在天之灵让她救这个人，是一种"宿命般的缘分"。这两把簪子的来历和关联，暗示着樊家与谢征之间可能有更深的渊源呢。'
+      };
+
+      function simulateReply(q) {
+        let answer = '';
+        for (const [k, v] of Object.entries(FAQ_MAP)) {
+          if (q.includes(k) || k.includes(q)) { answer = v; break; }
+        }
+        if (!answer) {
+          answer = `关于"${q}"这个问题，我需要结合更多剧集内容来回答你～目前我已经看完了前5集的剧情，你可以试试问一些关于人物关系、关键情节或者伏笔的问题，我会尽力帮你解答！`;
+        }
+        setTimeout(() => {
+          const div = document.createElement('div');
+          div.className = 'ai-assist-reply';
+          div.innerHTML = `
+            <div class="ai-assist-avatar"><img src="./assets/penguin-fab.png" alt="" /></div>
+            <div class="ai-assist-msg">${answer}</div>`;
+          body.appendChild(div);
+          body.scrollTop = body.scrollHeight;
+        }, 500 + Math.random() * 400);
+      }
+    })();
+
     return wrap;
   }
 
@@ -1060,89 +1161,4 @@ const idx = Number(entry.target.dataset.index);
     });
   });
 
-  // 7. 全局 AI 懂剧助手 悬浮窗
-  (function initAIAssist() {
-    const fab = document.getElementById('aiAssistFab');
-    const overlay = document.getElementById('aiAssistOverlay');
-    const modal = document.getElementById('aiAssistModal');
-    const closeBtn = document.getElementById('aiAssistClose');
-    const body = document.getElementById('aiAssistBody');
-    const input = document.getElementById('aiAssistInput');
-    const sendBtn = document.getElementById('aiAssistSend');
-
-    if (!fab || !modal) return;
-
-    function openAssist() {
-      overlay.classList.add('show');
-      modal.classList.add('show');
-      input.focus();
-    }
-    function closeAssist() {
-      overlay.classList.remove('show');
-      modal.classList.remove('show');
-    }
-
-    fab.addEventListener('click', openAssist);
-    closeBtn.addEventListener('click', closeAssist);
-    overlay.addEventListener('click', closeAssist);
-
-    // 快捷问题 → 模拟用户提问 + AI 回复
-    body.addEventListener('click', (e) => {
-      const sugBtn = e.target.closest('.ai-assist-sug');
-      if (!sugBtn) return;
-      const q = sugBtn.dataset.q || sugBtn.textContent.trim();
-      appendUserQ(q);
-      simulateReply(q);
-    });
-
-    // 输入框发送
-    function doSend() {
-      const q = input.value.trim();
-      if (!q) return;
-      input.value = '';
-      appendUserQ(q);
-      simulateReply(q);
-    }
-    sendBtn.addEventListener('click', doSend);
-    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSend(); });
-
-    // 追加用户提问气泡
-    function appendUserQ(text) {
-      const div = document.createElement('div');
-      div.className = 'ai-assist-user-q';
-      div.innerHTML = `<div class="ai-assist-user-bubble">${text}</div>`;
-      body.appendChild(div);
-      body.scrollTop = body.scrollHeight;
-    }
-
-    // 模拟 AI 回答（基于 FAQ 数据 + 默认兜底）
-    const FAQ_MAP = {
-      '谢征为什么愿意入赘？': '主要有两个原因：一是报恩，长玉在雪地里救了他一命，还当掉母亲的银簪子为他治伤；二是对长玉动心了。第2集中长玉想提入赘的事却不好意思开口，谢征听到她跟猪"诉苦"才知道这件事，于是主动答应入赘，帮她保住宅子不被大伯夺走。',
-      '新婚夜泼水那段是怎么回事？': '第5集中，长玉不小心把赵大娘送的"画本"丢出窗外，砸中了偷听的大伯和大伯母。为了不让他们发现是假成婚，谢征让长玉把蜡烛放侧边，把两人的影子映在窗户上——演了一出"假圆房"的戏。大伯娘还想翻墙来看，长玉出来故意往他们那边泼水，大伯娘尝了味道后信以为真！',
-      '谢征的银簪子是怎么赎回来的？': '长玉为了救谢征，把母亲的银簪子当掉换了二两银子。第4集中，谢征通过传讯鸟联络亲信五七，特意写了一篇时文让赵大叔拿去四季书肆，换得二十两银子，偷偷把银簪子赎了回来。第5集他半真半假地跟长玉说是书肆老板赏识他的时文，送了簪子和二十两给他，长玉信以为真～',
-      '樊长玉的武功是跟谁学的？': '樊长玉的武功是跟父亲樊二牛学的。她父亲教她"长柄刀法"，嘱咐她不能轻易示人。第2集中长玉仅靠一根棍子就把金爷的手下打得屁滚尿流！不过她父亲为什么一个杀猪屠户会这套精妙刀法，这里面藏着很大的秘密哦。',
-      '两把一模一样的玉簪子有什么含义？': '第1集中，长玉在雪地救下谢征时，发现他手中有一把玉簪子，跟她母亲的玉簪子一模一样。长玉觉得这是母亲在天之灵让她救这个人，是一种"宿命般的缘分"。这两把簪子的来历和关联，暗示着樊家与谢征之间可能有更深的渊源呢。'
-    };
-
-    function simulateReply(q) {
-      // 匹配 FAQ 或模糊匹配
-      let answer = '';
-      for (const [k, v] of Object.entries(FAQ_MAP)) {
-        if (q.includes(k) || k.includes(q)) { answer = v; break; }
-      }
-      if (!answer) {
-        answer = `关于"${q}"这个问题，我需要结合更多剧集内容来回答你～目前我已经看完了前5集的剧情，你可以试试问一些关于人物关系、关键情节或者伏笔的问题，我会尽力帮你解答！`;
-      }
-
-      setTimeout(() => {
-        const div = document.createElement('div');
-        div.className = 'ai-assist-reply';
-        div.innerHTML = `
-          <div class="ai-assist-avatar"><img src="./assets/penguin-fab.png" alt="" /></div>
-          <div class="ai-assist-msg">${answer}</div>`;
-        body.appendChild(div);
-        body.scrollTop = body.scrollHeight;
-      }, 500 + Math.random() * 400); // 模拟思考延迟
-    }
-  })();
 })();
