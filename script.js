@@ -786,7 +786,7 @@ const hidden = isAll ? {
     return '';
   }
 
-  function panelByKey(tab, sub, range) {
+  function panelByKey(tab, range) {
     if (tab === 'detail') return panelDetail();
     if (tab === 'ugc') return panelUgc();
     if (tab === 'discuss') return panelDiscuss();
@@ -822,7 +822,7 @@ const hidden = isAll ? {
        </span>
    `).join('')}
     </div>
-     <div class="tp-panel" data-panel>${panelByKey(defaultTab, defaultSub, 'only')}</div>
+     <div class="tp-panel" data-panel>${panelByKey(defaultTab, 'only')}</div>
        </div>
      <div class="tp-fab" data-fab style="display:${defaultTab === 'ai' ? 'flex' : 'none'}"><img src="./assets/penguin-fab.png" alt="懂剧助手" /></div>
      <div class="tp-chat" data-chat>
@@ -995,7 +995,6 @@ sheet.addEventListener('click', (e) => {
     // 保存状态供外部切换使用
     wrap._tpState = state;
     wrap._panelEl = panelEl;
-    bindSubTabs();
     bindRangeChips();
     bindRelCards();
     bindWorldZoom(panelEl);
