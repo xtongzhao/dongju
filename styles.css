@@ -386,6 +386,7 @@ html, body {
 /* --- 通用面板 --- */
 .tp-panel {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding: 12px 14px 20px;
   background: #fff;

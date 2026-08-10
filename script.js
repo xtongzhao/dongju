@@ -892,9 +892,15 @@ const hidden = isAll ? {
       // 高亮当前 tab
       panelEl.querySelectorAll('.ai-sub').forEach(s => s.classList.remove('on'));
       subTab.classList.add('on');
-      // 平滑滚动到对应板块
-      const target = panelEl.querySelector(subTab.getAttribute('href'));
-      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // 在面板内部精确滚动到对应板块，不影响外层页面
+      const id = subTab.getAttribute('href');
+      const target = panelEl.querySelector(id);
+      if (target) {
+        const top = target.getBoundingClientRect().top
+          - panelEl.getBoundingClientRect().top
+          + panelEl.scrollTop - 6;
+        panelEl.scrollTo({ top, behavior: 'smooth' });
+      }
     });
 
     // 回顾范围 chip 切换（仅第4集 / 第1~4集）
