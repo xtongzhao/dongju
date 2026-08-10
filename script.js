@@ -984,28 +984,27 @@ const hidden = isAll ? {
         sheet.classList.remove('open');
         setTimeout(() => { sheet.hidden = true; inner.innerHTML = ''; }, 260);
       }
-sheet.addEventListener('click', (e) => {
-     if (e.target === sheet) close();
-    });
-
- // 使用事件委托：即使 DOM 重渲染也不会丢失点击
- if (!panelEl._relDelegated) {
-   panelEl._relDelegated = true;
-   panelEl.addEventListener('click', (e) => {
-     const chip = e.target.closest('.rel-chip[data-char]');
-     const node = e.target.closest('.rel-canvas .node-pos[data-char]');
-     const sheetRel = e.target.closest('.sheet-rel[data-char]');
-     const closeBtn = e.target.closest('[data-close]');
-     const target = chip || node || sheetRel;
-     if (target) {
-       e.stopPropagation();
-       openChar(target.dataset.char);
-     } else if (closeBtn) {
-       close();
-     }
-   });
- }
-   }
+      // sheet 现在挂在 wrap 层级（.phone-screen 内），事件委托必须绑到 wrap 才能捕获 X 关闭、遮罩关闭、弹层内 sheet-rel 跳转
+      if (!wrap._relDelegated) {
+        wrap._relDelegated = true;
+        //点击遮罩关闭
+        sheet.addEventListener('click', (e) => { if (e.target === sheet) close(); });
+        // 委托：面板内头像 / 面板内关系图节点 / 弹层内的其他人物 / 弹层 X
+        wrap.addEventListener('click', (e) => {
+          const chip = e.target.closest('.rel-chip[data-char]');
+          const node = e.target.closest('.rel-canvas .node-pos[data-char]');
+          const sheetRel = e.target.closest('.sheet-rel[data-char]');
+          const closeBtn = e.target.closest('[data-close]');
+          const target = chip || node || sheetRel;
+          if (target) {
+            e.stopPropagation();
+            openChar(target.dataset.char);
+          } else if (closeBtn) {
+            close();
+          }
+        });
+      }
+    }
     // 保存状态供外部切换使用
     wrap._tpState = state;
     wrap._panelEl = panelEl;
