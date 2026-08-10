@@ -647,6 +647,14 @@ font-size: 9px;
 
 .tp-ai-content { position: relative; }
 
+/* AI 子部分切换过渡：避免硬切跳变，跟随滑动方向淡入位移 */
+.tp-ai-content.ai-enter { animation: aiFade .26s cubic-bezier(.22,.61,.36,1) both; }
+.tp-ai-content.ai-enter.ai-enter-up { animation-name: aiEnterUp; }
+.tp-ai-content.ai-enter.ai-enter-down { animation-name: aiEnterDown; }
+@keyframes aiFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes aiEnterUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes aiEnterDown { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }
+
 .ai-card {
   border: 1px solid #ecf1ef;
   border-radius: 14px;

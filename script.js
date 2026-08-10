@@ -859,7 +859,7 @@ const hidden = isAll ? {
     const state = { tab: defaultTab, sub: defaultSub || 'recap', range: 'only' };
 
     // 渲染封装（一级/二级切换、集数切换都复用）
-    function rebuildPanel() {
+    function rebuildPanel(animDir) {
       wrap.querySelectorAll('.tp-tab').forEach(x => x.classList.toggle('on', x.dataset.tab === state.tab));
       panelEl.innerHTML = panelByKey(state.tab, state.sub, state.range);
       fabEl.style.display = state.tab === 'ai' ? 'flex' : 'none';
@@ -869,6 +869,17 @@ const hidden = isAll ? {
       bindRelCards();
       bindWorldZoom(panelEl);
       panelEl.scrollTop = 0;
+      // 子部分切换时的进入过渡，让滑动切换更顺滑
+      if (animDir && state.tab === 'ai') {
+        const c = panelEl.querySelector('.tp-ai-content');
+        if (c) {
+          c.classList.add('ai-enter');
+          c.classList.add(animDir > 0 ? 'ai-enter-up' : 'ai-enter-down');
+          c.addEventListener('animationend', () => {
+            c.classList.remove('ai-enter', 'ai-enter-up', 'ai-enter-down');
+          }, { once: true });
+        }
+      }
     }
 
     wrap.querySelectorAll('.tp-tab').forEach(t => {
@@ -879,14 +890,17 @@ const hidden = isAll ? {
     });
 
     // AI 懂剧 二级子部分切换（点击子 Tab / 上下滑动 / 滚轮）
-    function switchSub(key) {
+    function switchSub(key, dir) {
       state.tab = 'ai';
       state.sub = key;
-      rebuildPanel();
+      rebuildPanel(dir || 0);
     }
 
     // 上下滑动 / 滚轮在 5 个 AI 子部分间切换
-    let _swipeLock = 0, _tsY = 0, _tsX = 0;
+    // 解决跳变：① 内容不足一屏时上下边界同时为真，需单独处理
+    //          ② 滚轮惯性会连发事件，用累积阈值 + 锁定防止一次手势连续跳
+    let _swipeLock = 0, _tsY = 0, _tsX = 0, _wheelAccum = 0, _touchMax = 0;
+    function _canScroll() { return panelEl.scrollHeight > panelEl.clientHeight + 4; }
     function _atTop() { return panelEl.scrollTop <= 1; }
     function _atBottom() { return panelEl.scrollTop + panelEl.clientHeight >= panelEl.scrollHeight - 1; }
     function _goSub(dir) {
@@ -894,27 +908,52 @@ const hidden = isAll ? {
       const idx = AI_SUBTABS.findIndex(s => s.key === state.sub);
       const ni = idx + dir;
       if (ni < 0 || ni >= AI_SUBTABS.length) return;
-      switchSub(AI_SUBTABS[ni].key);
+      switchSub(AI_SUBTABS[ni].key, dir);
+    }
+    function _lock(ms) {
+      clearTimeout(_swipeLock);
+      _swipeLock = setTimeout(() => { _swipeLock = 0; _wheelAccum = 0; _touchMax = 0; }, ms);
     }
     panelEl.addEventListener('touchstart', (e) => {
-      const t = e.touches[0]; _tsY = t.clientY; _tsX = t.clientX;
+      if (_swipeLock) return;
+      const t = e.touches[0]; _tsY = t.clientY; _tsX = t.clientX; _touchMax = 0;
+    }, { passive: true });
+    panelEl.addEventListener('touchmove', (e) => {
+      const t = e.touches[0];
+      _touchMax = Math.max(_touchMax, Math.abs(t.clientY - _tsY));
     }, { passive: true });
     panelEl.addEventListener('touchend', (e) => {
       if (_swipeLock) return;
       const t = e.changedTouches[0];
       const dy = _tsY - t.clientY;
       const dx = t.clientX - _tsX;
-      if (Math.abs(dy) < 50 || Math.abs(dx) > Math.abs(dy)) return;
-      if (dy > 0 && _atBottom()) { _goSub(1); _swipeLock = setTimeout(() => _swipeLock = 0, 600); }
-      else if (dy < 0 && _atTop()) { _goSub(-1); _swipeLock = setTimeout(() => _swipeLock = 0, 600); }
+      // 位移太小或主要是横向滑动 → 不切
+      if (_touchMax < 60 || Math.abs(dx) > Math.abs(dy)) return;
+      if (_canScroll()) {
+        // 内容可滚动：必须真的滚到边界再继续滑才切
+        if (dy > 0 && _atBottom()) { _goSub(1); _lock(600); }
+        else if (dy < 0 && _atTop()) { _goSub(-1); _lock(600); }
+      } else {
+        // 内容不足一屏：方向直接决定上下游走（此时上下边界都视为可切）
+        if (dy > 0) { _goSub(1); _lock(600); }
+        else { _goSub(-1); _lock(600); }
+      }
     }, { passive: true });
     panelEl.addEventListener('wheel', (e) => {
-      if (state.tab !== 'ai' || _swipeLock) return;
-      let switched = false;
-      const before = state.sub;
-      if (e.deltaY > 0 && _atBottom()) { _goSub(1); switched = state.sub !== before; }
-      else if (e.deltaY < 0 && _atTop()) { _goSub(-1); switched = state.sub !== before; }
-      if (switched) { e.preventDefault(); _swipeLock = setTimeout(() => _swipeLock = 0, 700); }
+      if (state.tab !== 'ai') { _wheelAccum = 0; return; }
+      if (_swipeLock) { _wheelAccum = 0; return; } // 锁定期内忽略并清零累积，避免释放瞬间连跳
+      // 可滚动面板且未到边界：放行原生滚动，不拦截、不累积
+      if (_canScroll()) {
+        if (e.deltaY > 0 && !_atBottom()) return;
+        if (e.deltaY < 0 && !_atTop()) return;
+      }
+      _wheelAccum += e.deltaY;
+      if (Math.abs(_wheelAccum) < 90) return; // 累积阈值，过滤触控板惯性碎事件
+      const dir = _wheelAccum > 0 ? 1 : -1;
+      _goSub(dir);
+      _wheelAccum = 0;
+      e.preventDefault();
+      _lock(700);
     }, { passive: false });
     // AI 二级 Tab 切换（每次重渲染都要重绑）
     function bindSubTabs() {
