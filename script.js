@@ -1070,14 +1070,30 @@ sheet.addEventListener('click', (e) => {
         if (!answer) {
           answer = `关于"${q}"这个问题，我需要结合更多剧集内容来回答你～目前我已经看完了前5集的剧情，你可以试试问一些关于人物关系、关键情节或者伏笔的问题，我会尽力帮你解答！`;
         }
+        // 先显示「正在输入」气泡，再逐字流式输出
         setTimeout(() => {
           const div = document.createElement('div');
           div.className = 'ai-assist-reply';
           div.innerHTML = `
             <div class="ai-assist-avatar"><img src="./assets/penguin-fab.png" alt="" /></div>
-            <div class="ai-assist-msg">${answer}</div>`;
+            <div class="ai-assist-msg"><span class="ai-type-text"></span><span class="ai-cursor"></span></div>`;
           body.appendChild(div);
+          const textEl = div.querySelector('.ai-type-text');
+          const cursorEl = div.querySelector('.ai-cursor');
           body.scrollTop = body.scrollHeight;
+
+          let i = 0;
+          const speed = 22; // 每字间隔(ms)
+          (function typeTick() {
+            if (i <= answer.length) {
+              textEl.textContent = answer.slice(0, i);
+              body.scrollTop = body.scrollHeight;
+              i++;
+              setTimeout(typeTick, speed);
+            } else {
+              cursorEl.remove(); // 输出完成，移除光标
+            }
+          })();
         }, 500 + Math.random() * 400);
       }
     })();

@@ -1694,7 +1694,7 @@ display: flex;
 /* 聊天卡片（自底部滑入的半层） */
 .ai-assist-card {
   width: 100%;
-  height: 45%;
+  height: 60%;
   background: #fff;
   border-radius: 20px 20px 0 0;
   box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.18);
@@ -1848,6 +1848,20 @@ display: flex;
   background: #fff;
   border-color: #e5e7eb;
 }
+/* 流式打字光标 */
+.ai-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 14px;
+  margin-left: 2px;
+  background: #14b8a6;
+  vertical-align: -2px;
+  animation: aiCursorBlink 0.9s step-end infinite;
+}
+@keyframes aiCursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
 
 /* 用户提问气泡 */
 .ai-assist-user-q {
@@ -1917,7 +1931,7 @@ display: flex;
 
 /* 响应式：手机内半层聊天窗 */
 @media (max-width: 480px) {
-  .ai-assist-card { height: 48%; }
+  .ai-assist-card { height: 62%; }
   .tp-fab { right: 14px; bottom: 20px; width: 46px; height: 46px; }
 }
 @media (max-width: 1024px) {
