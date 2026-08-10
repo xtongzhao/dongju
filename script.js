@@ -857,48 +857,79 @@ const hidden = isAll ? {
     const fabEl = wrap.querySelector('[data-fab]');
     const chatEl = wrap.querySelector('[data-chat]');
     const state = { tab: defaultTab, sub: defaultSub || 'recap', range: 'only' };
-    wrap.querySelectorAll('.tp-tab').forEach(t => {
-    t.addEventListener('click', () => {
-   wrap.querySelectorAll('.tp-tab').forEach(x => x.classList.remove('on'));
-   t.classList.add('on');
-   state.tab = t.dataset.tab;
-   panelEl.innerHTML = panelByKey(state.tab, state.sub, state.range);
-    fabEl.style.display = state.tab === 'ai' ? 'flex' : 'none';
-    if (chatEl) chatEl.classList.remove('open');
-    bindSubTabs();
-     bindRangeChips();
-   bindRelCards();
-     bindWorldZoom(panelEl);
-     panelEl.scrollTop = 0;
- });
- });
-    // AI 二级 Tab 切换（每次重渲染都要重绑）
-    function bindSubTabs() {
-  panelEl.querySelectorAll('.ai-sub').forEach(s => {
-s.addEventListener('click', () => {
-     state.sub = s.dataset.sub;
- panelEl.innerHTML = panelByKey(state.tab, state.sub, state.range);
-     bindSubTabs();
-       bindRangeChips();
-   bindRelCards();
-     bindWorldZoom(panelEl);
+
+    // 渲染封装（一级/二级切换、集数切换都复用）
+    function rebuildPanel() {
+      wrap.querySelectorAll('.tp-tab').forEach(x => x.classList.toggle('on', x.dataset.tab === state.tab));
+      panelEl.innerHTML = panelByKey(state.tab, state.sub, state.range);
+      fabEl.style.display = state.tab === 'ai' ? 'flex' : 'none';
+      if (chatEl) chatEl.classList.remove('open');
+      bindSubTabs();
+      bindRangeChips();
+      bindRelCards();
+      bindWorldZoom(panelEl);
       panelEl.scrollTop = 0;
+    }
+
+    wrap.querySelectorAll('.tp-tab').forEach(t => {
+      t.addEventListener('click', () => {
+        state.tab = t.dataset.tab;
+        rebuildPanel();
       });
     });
+
+    // AI 懂剧 二级子部分切换（点击子 Tab / 上下滑动 / 滚轮）
+    function switchSub(key) {
+      state.tab = 'ai';
+      state.sub = key;
+      rebuildPanel();
+    }
+
+    // 上下滑动 / 滚轮在 5 个 AI 子部分间切换
+    let _swipeLock = 0, _tsY = 0, _tsX = 0;
+    function _atTop() { return panelEl.scrollTop <= 1; }
+    function _atBottom() { return panelEl.scrollTop + panelEl.clientHeight >= panelEl.scrollHeight - 1; }
+    function _goSub(dir) {
+      if (state.tab !== 'ai') return;
+      const idx = AI_SUBTABS.findIndex(s => s.key === state.sub);
+      const ni = idx + dir;
+      if (ni < 0 || ni >= AI_SUBTABS.length) return;
+      switchSub(AI_SUBTABS[ni].key);
+    }
+    panelEl.addEventListener('touchstart', (e) => {
+      const t = e.touches[0]; _tsY = t.clientY; _tsX = t.clientX;
+    }, { passive: true });
+    panelEl.addEventListener('touchend', (e) => {
+      if (_swipeLock) return;
+      const t = e.changedTouches[0];
+      const dy = _tsY - t.clientY;
+      const dx = t.clientX - _tsX;
+      if (Math.abs(dy) < 50 || Math.abs(dx) > Math.abs(dy)) return;
+      if (dy > 0 && _atBottom()) { _goSub(1); _swipeLock = setTimeout(() => _swipeLock = 0, 600); }
+      else if (dy < 0 && _atTop()) { _goSub(-1); _swipeLock = setTimeout(() => _swipeLock = 0, 600); }
+    }, { passive: true });
+    panelEl.addEventListener('wheel', (e) => {
+      if (state.tab !== 'ai' || _swipeLock) return;
+      let switched = false;
+      const before = state.sub;
+      if (e.deltaY > 0 && _atBottom()) { _goSub(1); switched = state.sub !== before; }
+      else if (e.deltaY < 0 && _atTop()) { _goSub(-1); switched = state.sub !== before; }
+      if (switched) { e.preventDefault(); _swipeLock = setTimeout(() => _swipeLock = 0, 700); }
+    }, { passive: false });
+    // AI 二级 Tab 切换（每次重渲染都要重绑）
+    function bindSubTabs() {
+      panelEl.querySelectorAll('.ai-sub').forEach(s => {
+        s.addEventListener('click', () => switchSub(s.dataset.sub));
+      });
     }
     // 回顾范围 chip 切换（仅第4集 / 第1~4集）
     function bindRangeChips() {
       panelEl.querySelectorAll('.ai-chips .range').forEach(c => {
- c.addEventListener('click', () => {
- state.range = c.dataset.range;
-panelEl.innerHTML = panelByKey(state.tab, state.sub, state.range);
- bindSubTabs();
-        bindRangeChips();
-     bindRelCards();
-   bindWorldZoom(panelEl);
-   panelEl.scrollTop = 0;
-     });
-    });
+        c.addEventListener('click', () => {
+          state.range = c.dataset.range;
+          rebuildPanel();
+        });
+      });
     }
 
     // 人物关系 —— 点击角色打开详情，点 × 关闭 + 缩放控制
