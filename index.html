@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>产品 Demo 看板</title>
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <!-- 左侧时间线导航 -->
+  <nav class="side-nav" aria-label="页面导航">
+    <ul id="navList"></ul>
+  </nav>
+
+  <!-- 右上角提示 -->
+  <div class="hint">
+    <span>↕</span>
+    <span>上下滑动 / 键盘 ↑↓ 翻页</span>
+  </div>
+
+  <!-- 主容器 -->
+  <main class="pages" id="pages">
+
+    <!-- Page 1 -->
+    <section class="page" data-index="0" data-title="Use As You Wish" data-default-tab="detail">
+      <div class="page-inner">
+        <div class="page-text">
+          <p class="eyebrow">Chapter 01</p>
+   <h1 class="page-title">Use As You Wish</h1>
+        <p class="page-subtitle">按你心意，随手就用</p>
+ <p class="page-desc">
+      不做花哨的入口，也不塞冗长的教学。播放器就是产品本身——
+        上滑看剧、点 Tab 换视角，每一层信息按需展开，用户想看什么，就得到什么。
+  </p>
+      <ul class="feat-list">
+     <li><span class="num">1</span>播放器 + 内容一体化，追剧不跳页</li>
+ <li><span class="num">2</span>四大 Tab 平铺 —— 详情 / 二创 / 讨论 / AI 懂剧</li>
+         <li><span class="num">3</span>Tab 内容自适应，"想看什么就展开什么"</li>
+            <li><span class="num">4</span>弹幕、二创、AI 剧解一屏直达</li>
+          </ul>
+        </div>
+        <div class="phone-mount"></div>
+      </div>
+    </section>
+
+    <!-- Page 2 -->
+    <section class="page recap-page" data-index="1" data-title="前情回顾" data-default-tab="ai" data-default-sub="recap">
+      <div class="page-inner">
+        <div class="page-text">
+        <p class="eyebrow">Chapter 02</p>
+          <h1 class="page-title">
+   <span class="title-icon" aria-hidden="true">
+         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+ <rect x="3.5" y="3.5" width="17" height="17" rx="3.5" stroke="currentColor" stroke-width="1.6"/>
+     <path d="M7.5 8.5h9M7.5 12h9M7.5 15.5h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+         </svg>
+         </span>
+      前情回顾
+          </h1>
+      <p class="page-subtitle">忘了剧情？30 秒帮你全想起来</p>
+     <p class="page-desc">
+            电影第二部上映了，第一部的剧情忘得一干二净？追剧追到一半太忙断更，再打开完全想不起来演到哪了？
+     又或者朋友安利中途入坑，前面的剧情完全跟不上？不用再翻电影解说了——AI 帮你 30 秒回顾所有前情，无缝接上。
+     </p>
+    <ul class="feat-list">
+  <li><span class="num">1</span>按集选择，回顾对应集数前的所有剧情</li>
+<li><span class="num">2</span>切换"仅上一集"或"全部前情"两种模式</li>
+    <li><span class="num">3</span>AI 生成的剧情摘要卡片，图文并茂</li>
+   <li><span class="num">4</span>名场面视频片段一键跳转播放</li>
+        </ul>
+        </div>
+        <div class="phone-mount"></div>
+      </div>
+    </section>
+
+    <!-- Page 3 -->
+    <section class="page" data-index="2" data-title="人物关系" data-default-tab="ai" data-default-sub="rel">
+      <div class="page-inner">
+<div class="page-text">
+          <p class="eyebrow">Chapter 03</p>
+          <h1 class="page-title">人物关系</h1>
+          <p class="page-subtitle">谁是谁的谁，一图理清</p>
+          <p class="page-desc">
+   角色多、关系乱、阵营反转？把复杂的人际网压成一张实时同步的关系图谱，
+     随剧情自动更新——用户点谁就展开谁，家族、羁绊、恩怨一目了然。
+          </p>
+   <ul class="feat-list">
+ <li><span class="num">1</span>动态关系图谱，随剧集实时刷新</li>
+            <li><span class="num">2</span>点角色即展开档案 / 关键场景</li>
+ <li><span class="num">3</span>亲密 / 敌对 / 未知 三态可视化</li>
+            <li><span class="num">4</span>阵营与家族一键筛选</li>
+          </ul>
+          <div class="wl-ep-tabs-wrap">
+            <div class="wl-ep-label">📍 当前在看</div>
+            <div class="wl-ep-tabs">
+              <button class="wl-ep-tab" data-ep="1">第1集</button>
+              <button class="wl-ep-tab" data-ep="2">第2集</button>
+              <button class="wl-ep-tab" data-ep="3">第3集</button>
+              <button class="wl-ep-tab" data-ep="4">第4集</button>
+              <button class="wl-ep-tab active" data-ep="5">第5集</button>
+            </div>
+          </div>
+     </div>
+        <div class="phone-mount"></div>
+      </div>
+    </section>
+
+  <!-- Page 4 -->
+    <section class="page" data-index="3" data-title="时间线" data-default-tab="ai" data-default-sub="time">
+      <div class="page-inner">
+      <div class="page-text">
+          <p class="eyebrow">Chapter 04</p>
+ <h1 class="page-title">时间线</h1>
+     <p class="page-subtitle">大事件，全都在这条线上</p>
+     <p class="page-desc">
+            按剧情时间轴串起所有关键节点：出场、转折、伏笔、高潮——每个节点都能秒跳原片。
+       倒着追、跳着追、补漏刷，用户按自己的节奏走。
+    </p>
+ <ul class="feat-list">
+            <li><span class="num">1</span>关键事件自动打点</li>
+            <li><span class="num">2</span>任意节点一键跳转原片</li>
+     <li><span class="num">3</span>伏笔 / 高潮 / 反转分类标签</li>
+     <li><span class="num">4</span>支持"仅本集"与"全剧"两种视图</li>
+ </ul>
+        </div>
+        <div class="phone-mount"></div>
+      </div>
+    </section>
+
+    <!-- Page 5 -->
+    <section class="page" data-index="4" data-title="世界线" data-default-tab="ai" data-default-sub="world">
+      <div class="page-inner">
+        <div class="page-text">
+     <p class="eyebrow">Chapter 05</p>
+  <h1 class="page-title">世界线</h1>
+          <p class="page-subtitle">平行叙事，一图看透</p>
+          <p class="page-desc">
+          当剧情涉及多条支线、平行世界或时空跳跃，普通时间轴讲不清。
+    世界线把所有分叉画成"地铁图"式导航，用户想去哪条线，点一下就到。
+      </p>
+    <ul class="feat-list">
+     <li><span class="num">1</span>多线并行可视化</li>
+            <li><span class="num">2</span>分叉节点单独解读</li>
+       <li><span class="num">3</span>当前所处"世界线"实时高亮</li>
+  <li><span class="num">4</span>支持任意支线跳转观看</li>
+          </ul>
+          <div class="wl-ep-tabs-wrap">
+            <div class="wl-ep-label">📍 当前在看</div>
+            <div class="wl-ep-tabs">
+              <button class="wl-ep-tab" data-ep="1">第1集</button>
+              <button class="wl-ep-tab" data-ep="2">第2集</button>
+              <button class="wl-ep-tab" data-ep="3">第3集</button>
+              <button class="wl-ep-tab" data-ep="4">第4集</button>
+              <button class="wl-ep-tab active" data-ep="5">第5集</button>
+            </div>
+          </div>
+        </div>
+<div class="phone-mount"></div>
+      </div>
+    </section>
+
+    <!-- Page 6 -->
+    <section class="page" data-index="5" data-title="常问问题 &amp; 懂剧助手" data-default-tab="ai" data-default-sub="faq">
+      <div class="page-inner">
+      <div class="page-text">
+          <p class="eyebrow">Chapter 06</p>
+          <h1 class="page-title">常问问题 &amp; 懂剧助手</h1>
+          <p class="page-subtitle">追剧路上，随问随答</p>
+          <p class="page-desc">
+       "她为什么最后没上车？""这条支线什么意思？"——懂剧助手基于剧情知识库随问随答，
+            默认无剧透模式，用户想深挖再展开。让追剧从"看不懂"变成"越看越上瘾"。
+          </p>
+     <ul class="feat-list">
+            <li><span class="num">1</span>官方精选高频问题，一键即得</li>
+       <li><span class="num">2</span>自由提问，AI 结合剧集知识作答</li>
+     <li><span class="num">3</span>无剧透 / 允许剧透 两种模式可切换</li>
+         <li><span class="num">4</span>可跳转到问题涉及的原片片段</li>
+  </ul>
+          <div class="wl-ep-tabs-wrap">
+            <div class="wl-ep-label">📍 当前在看</div>
+            <div class="wl-ep-tabs">
+              <button class="wl-ep-tab" data-ep="1">第1集</button>
+              <button class="wl-ep-tab" data-ep="2">第2集</button>
+              <button class="wl-ep-tab" data-ep="3">第3集</button>
+              <button class="wl-ep-tab" data-ep="4">第4集</button>
+              <button class="wl-ep-tab active" data-ep="5">第5集</button>
+            </div>
+          </div>
+        </div>
+        <div class="phone-mount"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="./script.js"></script>
+
+  <!-- 全局 AI 懂剧助手 悬浮窗 -->
+  <div class="ai-assist-fab" id="aiAssistFab">🤖</div>
+  <div class="ai-assist-overlay" id="aiAssistOverlay"></div>
+  <div class="ai-assist-modal" id="aiAssistModal">
+    <div class="ai-assist-head">
+      <span class="ai-assist-title">AI 懂剧助手</span>
+      <span class="ai-assist-badge">BETA</span>
+      <button class="ai-assist-close" id="aiAssistClose">×</button>
+    </div>
+    <div class="ai-assist-body" id="aiAssistBody">
+      <div class="ai-assist-welcome">
+        <div class="ai-assist-avatar">🤖</div>
+        <div class="ai-assist-msg">
+          你好呀！我是 AI 懂剧助手 🎬<br>有什么关于剧情的问题都可以问我哦。
+          <div class="ai-assist-note">📌 仅根据你看过的剧集作答</div>
+        </div>
+      </div>
+      <div class="ai-assist-suggests">
+        <button class="ai-assist-sug" data-q="谢征为什么愿意入赘？">谢征为什么愿意入赘？</button>
+        <button class="ai-assist-sug" data-q="新婚夜泼水那段是怎么回事？">新婚夜泼水那段是怎么回事？</button>
+        <button class="ai-assist-sug" data-q="谢征的银簪子是怎么赎回来的？">谢征的银簪子是怎么赎回来的？</button>
+      </div>
+    </div>
+    <div class="ai-assist-foot">
+      <input class="ai-assist-input" id="aiAssistInput" placeholder="想问什么剧情？" />
+      <button class="ai-assist-send" id="aiAssistSend">↑</button>
+    </div>
+  </div>
+</body>
+</html>
