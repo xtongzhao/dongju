@@ -1138,7 +1138,7 @@ const idx = Number(entry.target.dataset.index);
         const div = document.createElement('div');
         div.className = 'ai-assist-reply';
         div.innerHTML = `
-          <div class="ai-assist-avatar">🤖</div>
+          <div class="ai-assist-avatar"><img src="./assets/penguin-fab.png" alt="" /></div>
           <div class="ai-assist-msg">${answer}</div>`;
         body.appendChild(div);
         body.scrollTop = body.scrollHeight;
